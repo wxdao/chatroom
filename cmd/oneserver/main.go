@@ -1,0 +1,104 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"io"
+	"log"
+	"math/rand"
+	"net"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/wxdao/chatroom/internal/pkg/api"
+	"github.com/wxdao/chatroom/internal/pkg/infra"
+	"github.com/wxdao/chatroom/pkg/message"
+	"github.com/wxdao/chatroom/pkg/push"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
+)
+
+var messageAddr = flag.String("addr", "0.0.0.0:8000", "Listen address of message service")
+var pushAddr = flag.String("addr", "0.0.0.0:8001", "Listen address of push service")
+var pprofAddr = flag.String("pprof_addr", "0.0.0.0:6000", "Listen address of http pprof")
+var configFile = flag.String("config", "config.yaml", "Path to the config file")
+
+type syncReader struct {
+	mux    sync.Mutex
+	reader io.Reader
+}
+
+func (sr *syncReader) Read(p []byte) (n int, err error) {
+	sr.mux.Lock()
+	defer sr.mux.Unlock()
+
+	return sr.reader.Read(p)
+}
+
+func main() {
+	flag.Parse()
+
+	conf := parseConfigFromFile(*configFile)
+
+	errc := make(chan error)
+
+	// start http pprof
+	go func() {
+		errc <- http.ListenAndServe(*pprofAddr, nil)
+	}()
+
+	// setup mongo client
+	mgoClient, err := mongo.NewClient(
+		options.Client().ApplyURI(conf.MongoURI),
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = mgoClient.Connect(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	messageColl := mgoClient.Database(conf.MessageDB).Collection(conf.MessageColl)
+
+	// setup entropy
+	seed := time.Now().UnixNano()
+	source := rand.NewSource(seed)
+	entropy := &syncReader{reader: rand.New(source)}
+
+	// setup message event channel
+	eventChannel := infra.NewMemoryMessageEventChannel()
+
+	// start message service server
+	messageLis, err := net.Listen("tcp", *messageAddr)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	messageGRPCServer := grpc.NewServer()
+	message.RegisterMessageServiceServer(messageGRPCServer, &api.DomainMessageServiceServer{
+		MessageRepository:   infra.NewMgoMessageRepository(messageColl),
+		Entropy:             entropy,
+		MessageEventChannel: eventChannel,
+	})
+	go func() {
+		errc <- messageGRPCServer.Serve(messageLis)
+	}()
+
+	// start push service server
+	pushLis, err := net.Listen("tcp", *pushAddr)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	pushGRPCServer := grpc.NewServer()
+	push.RegisterPushServiceServer(pushGRPCServer, &api.DomainPushServiceServer{
+		MessageEventChannel: eventChannel,
+	})
+	go func() {
+		errc <- pushGRPCServer.Serve(pushLis)
+	}()
+
+	log.Fatal(<-errc)
+}
