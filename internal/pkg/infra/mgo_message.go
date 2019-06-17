@@ -36,10 +36,13 @@ func (repo *MgoMessageRepository) MessageByID(id string) (*domain.Message, error
 }
 
 // MessageInRange implements MessageRepository.MessageInRange
-func (repo *MgoMessageRepository) MessageInRange(startID string, endID string) ([]*domain.Message, error) {
+func (repo *MgoMessageRepository) MessageInRange(chatroomID string, startID string, endID string) ([]*domain.Message, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	filter := bson.M{"id": bson.M{"$lte": endID, "$gte": startID}}
+	filter := bson.M{
+		"chatroomID": chatroomID,
+		"id":         bson.M{"$lte": endID, "$gte": startID},
+	}
 	cur, err := repo.messageColl.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -77,6 +80,7 @@ type mgoMessageModel struct {
 	ChatroomID string `bson:"chatroomID"`
 	Username   string `bson:"username"`
 	Content    string `bson:"content"`
+	CreateTime int64  `bson:"CreateTime"`
 }
 
 func newMgoMessageModel(message *domain.Message) *mgoMessageModel {
@@ -85,6 +89,7 @@ func newMgoMessageModel(message *domain.Message) *mgoMessageModel {
 	m.ChatroomID = message.XchatroomID
 	m.Username = message.Xusername
 	m.Content = message.Xcontent
+	m.CreateTime = message.XcreateTime.UnixNano()
 	return &m
 }
 
@@ -94,5 +99,6 @@ func (m mgoMessageModel) message() *domain.Message {
 	dm.XchatroomID = m.ChatroomID
 	dm.Xusername = m.Username
 	dm.Xcontent = m.Content
+	dm.XcreateTime = time.Unix(0, m.CreateTime)
 	return &dm
 }
