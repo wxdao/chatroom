@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"sync"
 	"time"
 
@@ -20,8 +21,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-var messageAddr = flag.String("addr", "0.0.0.0:8000", "Listen address of message service")
-var pushAddr = flag.String("addr", "0.0.0.0:8001", "Listen address of push service")
+var messageAddr = flag.String("message_addr", "0.0.0.0:8000", "Listen address of message service")
+var pushAddr = flag.String("push_addr", "0.0.0.0:8001", "Listen address of push service")
 var pprofAddr = flag.String("pprof_addr", "0.0.0.0:6000", "Listen address of http pprof")
 var configFile = flag.String("config", "config.yaml", "Path to the config file")
 
@@ -46,6 +47,7 @@ func main() {
 
 	// start http pprof
 	go func() {
+		log.Println("started http pprof on", *pprofAddr)
 		errc <- http.ListenAndServe(*pprofAddr, nil)
 	}()
 
@@ -84,6 +86,7 @@ func main() {
 		MessageEventChannel: eventChannel,
 	})
 	go func() {
+		log.Println("started message service server on", *messageAddr)
 		errc <- messageGRPCServer.Serve(messageLis)
 	}()
 
@@ -97,6 +100,7 @@ func main() {
 		MessageEventChannel: eventChannel,
 	})
 	go func() {
+		log.Println("started push service server on", *pushAddr)
 		errc <- pushGRPCServer.Serve(pushLis)
 	}()
 
