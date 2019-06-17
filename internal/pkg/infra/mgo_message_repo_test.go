@@ -95,8 +95,14 @@ func TestMgoMessageRepositoryMessageInRange(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	err := repo.SaveMessage(
+		domain.NewMessage(ids[2], "testchatroom2", "testusername", strconv.Itoa(2)),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	msgs, err := repo.MessageInRange(ids[1], ids[3])
+	msgs, err := repo.MessageInRange("testchatroom", ids[1], ids[3])
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,6 +113,9 @@ func TestMgoMessageRepositoryMessageInRange(t *testing.T) {
 		x, _ := strconv.Atoi(msg.Content())
 		if x != i+1 {
 			t.Fatal("bad order")
+		}
+		if msg.ChatroomID() != "testchatroom" {
+			t.Fatal("unexpected chatroom id")
 		}
 	}
 }

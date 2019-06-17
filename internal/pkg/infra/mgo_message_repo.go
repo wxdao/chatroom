@@ -36,10 +36,13 @@ func (repo *MgoMessageRepository) MessageByID(id string) (*domain.Message, error
 }
 
 // MessageInRange implements MessageRepository.MessageInRange
-func (repo *MgoMessageRepository) MessageInRange(startID string, endID string) ([]*domain.Message, error) {
+func (repo *MgoMessageRepository) MessageInRange(chatroomID string, startID string, endID string) ([]*domain.Message, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	filter := bson.M{"id": bson.M{"$lte": endID, "$gte": startID}}
+	filter := bson.M{
+		"chatroomID": chatroomID,
+		"id":         bson.M{"$lte": endID, "$gte": startID},
+	}
 	cur, err := repo.messageColl.Find(ctx, filter)
 	if err != nil {
 		return nil, err

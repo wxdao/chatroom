@@ -1,5 +1,8 @@
 export PATH := $(shell go env GOPATH)/bin:dep/protoc/bin:$(PATH)
 
+PROTO_TARGETS = internal/pkg/api/message/message.pb.go \
+				internal/pkg/api/push/push.pb.go
+
 # --------------------------
 
 dep/protoc/bin/protoc:
@@ -13,10 +16,10 @@ dep-install: dep/protoc/bin/protoc
 
 # --------------------------
 
-internal/pkg/api/pb/push.pb.go: internal/pkg/api/pb/push.proto
-	protoc -I internal/pkg/api/pb $? --go_out=plugins=grpc:internal/pkg/api/pb
+$(PROTO_TARGETS): %.pb.go: %.proto
+	protoc -I $(dir $@) $< --go_out=plugins=grpc:$(dir $@)
 
-proto: internal/pkg/api/pb/push.pb.go
+proto: $(PROTO_TARGETS)
 
 # --------------------------
 
