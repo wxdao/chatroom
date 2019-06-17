@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package push;
 
 service PushService {
     rpc Messages(MessagesRequest) returns (stream MessagesReply);
@@ -21,4 +21,5 @@ message Message {
     string chatroomID = 2;
     string username = 3;
     string content = 4;
+    int64 createTime = 5;
 }

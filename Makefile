@@ -1,7 +1,7 @@
 export PATH := $(shell go env GOPATH)/bin:dep/protoc/bin:$(PATH)
 
-PROTO_TARGETS = internal/pkg/api/message/message.pb.go \
-				internal/pkg/api/push/push.pb.go
+PROTO_TARGETS = pkg/message/message.pb.go \
+				pkg/push/push.pb.go
 
 # --------------------------
 

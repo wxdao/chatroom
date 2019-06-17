@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package pb;
+package message;
 
 service MessageService {
     rpc QueryMessagesInRange(QueryMessagesInRangeRequest) returns (QueryMessagesInRangeReply);
@@ -34,4 +34,5 @@ message Message {
     string chatroomID = 2;
     string username = 3;
     string content = 4;
+    int64 createTime = 5;
 }

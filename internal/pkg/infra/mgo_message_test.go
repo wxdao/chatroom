@@ -33,7 +33,7 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	messageColl = mgoClient.Database("test").Collection("message")
+	messageColl = mgoClient.Database("repotest").Collection("message")
 
 	seed := time.Now().UnixNano()
 	source := rand.NewSource(seed)
@@ -61,7 +61,7 @@ func TestMgoMessageRepositoryMessageByID(t *testing.T) {
 	}
 
 	err = repo.SaveMessage(
-		domain.NewMessage(id, "testchatroom", "testusername", "testcontent"),
+		domain.NewMessage(id, "testchatroom", "testusername", "testcontent", time.Now()),
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -80,23 +80,23 @@ func TestMgoMessageRepositoryMessageInRange(t *testing.T) {
 	repo := infra.NewMgoMessageRepository(messageColl)
 
 	ids := []string{
+		ulid.MustNew(ulid.Timestamp(time.Unix(0, 0)), entropy).String(),
 		ulid.MustNew(ulid.Timestamp(time.Unix(1, 0)), entropy).String(),
 		ulid.MustNew(ulid.Timestamp(time.Unix(2, 0)), entropy).String(),
 		ulid.MustNew(ulid.Timestamp(time.Unix(3, 0)), entropy).String(),
 		ulid.MustNew(ulid.Timestamp(time.Unix(4, 0)), entropy).String(),
-		ulid.MustNew(ulid.Timestamp(time.Unix(5, 0)), entropy).String(),
 	}
 
 	for i, id := range ids {
 		err := repo.SaveMessage(
-			domain.NewMessage(id, "testchatroom", "testusername", strconv.Itoa(i)),
+			domain.NewMessage(id, "testchatroom", "testusername", strconv.Itoa(i), time.Unix(int64(i), 0)),
 		)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 	err := repo.SaveMessage(
-		domain.NewMessage(ids[2], "testchatroom2", "testusername", strconv.Itoa(2)),
+		domain.NewMessage(ids[2], "testchatroom2", "testusername", strconv.Itoa(2), time.Unix(2, 0)),
 	)
 	if err != nil {
 		t.Fatal(err)
