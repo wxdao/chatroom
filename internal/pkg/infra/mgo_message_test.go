@@ -22,7 +22,6 @@ var messageColl *mongo.Collection
 var entropy io.Reader
 
 func init() {
-	var err error
 	mgoClient, err := mongo.NewClient(
 		options.Client().ApplyURI("mongodb://localhost:27017"),
 	)
