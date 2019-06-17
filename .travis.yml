@@ -6,6 +6,14 @@ go:
 env:
 - GO111MODULE=on
 
+services:
+- mongodb
+
 install: go get ./...
+
+before_script:
+- curl -LO https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait
+- chmod +x wait
+- WAIT_HOSTS="localhost:27017" ./wait
 
 script: go test -v ./...
