@@ -1,0 +1,56 @@
+version: "3.7"
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017"
+    networks:
+      - chatroom
+
+  nats:
+    image: nats
+    ports:
+      - "4222"
+    networks:
+      - chatroom
+
+  oneserver1:
+    build:
+      context: ../..
+      dockerfile: build/oneserver/Dockerfile
+    image: oneserver
+    command: ["-config=/config.yml"]
+    volumes:
+      - "./config-compose.yml:/config.yml"
+    ports:
+      - "8000"
+      - "8001"
+      - "6000"
+    networks:
+      - chatroom
+    depends_on:
+      - mongo
+      - nats
+    restart: on-failure
+
+  oneserver2:
+    build:
+      context: ../..
+      dockerfile: build/oneserver/Dockerfile
+    image: oneserver
+    command: ["-config=/config.yml"]
+    volumes:
+      - "./config-compose.yml:/config.yml"
+    ports:
+      - "8000"
+      - "8001"
+      - "6000"
+    networks:
+      - chatroom
+    depends_on:
+      - mongo
+      - nats
+    restart: on-failure
+
+networks:
+  chatroom:

@@ -26,4 +26,13 @@ proto: $(PROTO_TARGETS)
 test: proto
 	go test -v ./...
 
-.PHONY: dep-install proto test
+# --------------------------
+
+oneserver: proto
+	CGO_ENABLED=0 go build -o output/oneserver ./cmd/oneserver
+
+client: proto
+	CGO_ENABLED=0 go build -o output/client ./cmd/client
+
+
+.PHONY: dep-install proto test oneserver client
