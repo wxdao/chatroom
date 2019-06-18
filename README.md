@@ -12,7 +12,7 @@
 
 ### 服务端逻辑
 
-实现 `MessageService` 接口的服务端接收到客户端的发送新消息请求后，生成消息对象并持久化到数据库中（当前用的是 mongo），并将消息对象提交至该消息所属聊天室的消息队列。
+实现 `MessageService` 接口的服务端接收到客户端的发送新消息请求后，生成消息对象并持久化到数据库中（当前用的是 mongo），并将消息对象提交至该消息所属聊天室的消息队列（当前用的是 nats）。
 
 实现 `PushService` 接口的服务端根据客户端的连接情况，从消息队列订阅相应聊天室的消息队列。消息队列中得到的消息对象通过与客户端使用 streaming 方法的长连接推送给客户端。
 
@@ -27,6 +27,8 @@
 ```bash
 $ docker-compose -f demo/oneserver/compose-server.yml up -d
 ```
+
+该命令会启动 mongo，nats 与两份 oneserver 副本（`oneserver1` 和 `oneserver2`）。
 
 运行客户端
 
