@@ -1,0 +1,5 @@
+mongoURI: mongodb://localhost:27017
+messageDB: chatroomdemo
+messageColl: message
+natsAddr: localhost:4222
+natsSubjectPrefix: chatroomdemo

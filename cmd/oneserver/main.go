@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"github.com/wxdao/chatroom/internal/pkg/api"
 	"github.com/wxdao/chatroom/internal/pkg/infra"
 	"github.com/wxdao/chatroom/pkg/message"
@@ -73,7 +74,16 @@ func main() {
 	entropy := &syncReader{reader: rand.New(source)}
 
 	// setup message event channel
-	eventChannel := infra.NewMemoryMessageEventChannel()
+	var eventChannel api.MessageEventChannel
+	if conf.NatsAddr != "" {
+		nc, err := nats.Connect(conf.NatsAddr)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		eventChannel = infra.NewNatsMessageEventChannel(nc, conf.NatsSubjectPrefix)
+	} else {
+		eventChannel = infra.NewMemoryMessageEventChannel()
+	}
 
 	// start message service server
 	messageLis, err := net.Listen("tcp", *messageAddr)
