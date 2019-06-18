@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  client:
+    build:
+      context: ../..
+      dockerfile: build/client/Dockerfile
+    networks:
+      - chatroom
+
+networks:
+  chatroom:
+    external: true
+    name: oneserver_chatroom
