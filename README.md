@@ -38,10 +38,12 @@ $ docker-compose -f demo/oneserver/compose-client.yml run --rm client oneserverX
 
 `chatroom` 与 `username` 可换成目标聊天室与用户名。
 
-![screenshot](screenshot.jpg)
+![screencast](screencast.gif)
 
 ## Roadmap
 
 - 分离消息服务与推送服务（各自 scale）
 
 - Kubernetes 部署演示
+
+- Observability
