@@ -3,11 +3,13 @@ module github.com/wxdao/chatroom
 go 1.12
 
 require (
+	github.com/gdamore/tcell v1.1.2
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/oklog/ulid/v2 v2.0.2
+	github.com/rivo/tview v0.0.0-20190609162513-b62197ade412
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect

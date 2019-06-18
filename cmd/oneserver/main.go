@@ -19,6 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 var messageAddr = flag.String("message_addr", "0.0.0.0:8000", "Listen address of message service")
@@ -95,7 +96,14 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	pushGRPCServer := grpc.NewServer()
+	pushGRPCServer := grpc.NewServer(
+		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+			MinTime: 30 * time.Second,
+		}),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			Time: time.Minute,
+		}),
+	)
 	push.RegisterPushServiceServer(pushGRPCServer, &api.DomainPushServiceServer{
 		MessageEventChannel: eventChannel,
 	})
