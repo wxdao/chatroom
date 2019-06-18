@@ -36,7 +36,7 @@ $ docker-compose -f demo/oneserver/compose-server.yml up -d
 $ docker-compose -f demo/oneserver/compose-client.yml run --rm client oneserverX:8000 oneserverX:8001 chatroom username
 ```
 
-其中 `oneserverX` 可以替换为 `oneserver1` 或者 `oneserver2`，代表所连接的服务端 `oneserver `实例编号。此处模拟服务端的横向扩容，实际场景中客户端经 load balencr 连接到不同的服务器实例均能正常工作。
+其中 `oneserverX` 可以替换为 `oneserver1` 或者 `oneserver2`，代表所连接的服务端 oneserver 实例编号。此处模拟服务端的横向扩容，实际场景中客户端经 load balencr 连接到不同的服务器实例均能正常工作。
 
 `chatroom` 与 `username` 可换成目标聊天室与用户名。
 
