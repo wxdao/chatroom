@@ -8,6 +8,8 @@ require (
 	github.com/golang/protobuf v1.3.1
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/nats-io/nats-server/v2 v2.0.0 // indirect
+	github.com/nats-io/nats.go v1.8.1
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/rivo/tview v0.0.0-20190609162513-b62197ade412
 	github.com/stretchr/testify v1.3.0 // indirect
