@@ -28,8 +28,6 @@ oneserver 默认会监听三个端口：8000、8001、6000，分别提供 Messag
 
 ## Docker Compose 演示
 
-### oneserver
-
 运行服务端
 
 ```bash
