@@ -7,13 +7,16 @@ env:
 - GO111MODULE=on
 
 services:
-- mongodb
+- docker
 
 install: make dep-install
 
 before_script:
 - curl -LO https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait
 - chmod +x wait
+- docker run -d -p 27017:27017 mongo
 - WAIT_HOSTS="localhost:27017" ./wait
+- docker run -d -p 4222:4222 nats
+- WAIT_HOSTS="localhost:4222" ./wait
 
 script: make test

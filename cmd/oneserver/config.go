@@ -8,9 +8,11 @@ import (
 )
 
 type config struct {
-	MongoURI    string `yaml:"mongoURI"`
-	MessageDB   string `yaml:"messageDB"`
-	MessageColl string `yaml:"messageColl"`
+	MongoURI          string `yaml:"mongoURI"`
+	MessageDB         string `yaml:"messageDB"`
+	MessageColl       string `yaml:"messageColl"`
+	NatsAddr          string `yaml:"natsAddr"`
+	NatsSubjectPrefix string `yaml:"natsSubjectPrefix"`
 }
 
 func parseConfigFromFile(filename string) *config {
